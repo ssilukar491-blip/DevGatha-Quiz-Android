@@ -2,9 +2,10 @@
   "name": "devgatha-quiz",
   "version": "1.0.0",
   "private": true,
-  "scripts": {
-    "build:android": "cap sync android"
-  },
+"script" : {
+  "build:android": "cap sync android",
+  "create:android": "cap add android"
+},
   "dependencies": {
     "@capacitor/core": "^6.2.0",
     "@capacitor/android": "^6.2.0"
