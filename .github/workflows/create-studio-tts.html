@@ -1,0 +1,270 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10101f">
+  <title>DevGatha Offline TTS Studio</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #10101f;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+    }
+
+    .studio {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      border: 1px solid #38385c;
+      border-radius: 18px;
+      background: #19192d;
+    }
+
+    h1 {
+      text-align: center;
+      color: #ffd700;
+      font-size: 25px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #ff70d0;
+    }
+
+    label {
+      display: block;
+      margin-top: 18px;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    textarea, select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #49496c;
+      border-radius: 10px;
+      background: #10101f;
+      color: white;
+      font-size: 16px;
+    }
+
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: #ff55c8;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button {
+      flex: 1;
+      padding: 14px 8px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #speak {
+      background: #ffd700;
+      color: #111;
+    }
+
+    #stop {
+      background: #ff4d6d;
+      color: white;
+    }
+
+    #test {
+      width: 100%;
+      margin-top: 10px;
+      background: #303052;
+      color: white;
+    }
+
+    #status {
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #10101f;
+      color: #7dffb3;
+      overflow-wrap: anywhere;
+    }
+
+    .note {
+      margin-top: 16px;
+      color: #c5c5df;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="studio">
+    <h1>🔊 DevGatha TTS Studio</h1>
+    <p class="subtitle">Text to Speech — Voice Studio</p>
+
+    <label for="text">अपना टेक्स्ट लिखो</label>
+    <textarea id="text"
+      placeholder="यहाँ हिंदी या English में लिखो...">नमस्ते! DevGatha Quiz में आपका स्वागत है।</textarea>
+
+    <label for="language">आवाज़ की भाषा</label>
+    <select id="language">
+      <option value="hi-IN">हिंदी — India</option>
+      <option value="en-IN">English — India</option>
+      <option value="en-US">English — USA</option>
+    </select>
+
+    <label for="speed">
+      बोलने की स्पीड: <span id="speedValue">1.0</span>
+    </label>
+    <input id="speed" type="range"
+      min="0.5" max="2" step="0.1" value="1">
+
+    <label for="pitch">
+      आवाज़ का उतार-चढ़ाव: <span id="pitchValue">1.0</span>
+    </label>
+    <input id="pitch" type="range"
+      min="0.5" max="2" step="0.1" value="1">
+
+    <div class="buttons">
+      <button id="speak">▶ Speak</button>
+      <button id="stop">■ Stop</button>
+    </div>
+
+    <button id="test">🔍 आवाज़ टेस्ट करो</button>
+
+    <div id="status" role="status" aria-live="polite">
+      तैयार है। टेक्स्ट लिखकर Speak दबाओ।
+    </div>
+
+    <p class="note">
+      ध्यान दें: यह पेज डिवाइस की उपलब्ध Speech Synthesis आवाज़ इस्तेमाल करता है।
+      ऑफलाइन बोलना तभी संभव होगा जब फोन में संबंधित भाषा की आवाज़ उपलब्ध हो
+      और ब्राउज़र या Android WebView उसे सपोर्ट करे। यह MP3 फ़ाइल नहीं बनाता।
+    </p>
+  </main>
+
+  <script>
+    const textBox = document.getElementById("text");
+    const language = document.getElementById("language");
+    const speed = document.getElementById("speed");
+    const pitch = document.getElementById("pitch");
+    const status = document.getElementById("status");
+
+    const speedValue = document.getElementById("speedValue");
+    const pitchValue = document.getElementById("pitchValue");
+
+    let voices = [];
+
+    function loadVoices() {
+      if ("speechSynthesis" in window) {
+        voices = window.speechSynthesis.getVoices();
+      }
+    }
+
+    function speakText(value) {
+      if (!("speechSynthesis" in window)) {
+        status.textContent =
+          "इस ब्राउज़र/WebView में Speech Synthesis उपलब्ध नहीं है।";
+        return;
+      }
+
+      const message = value.trim();
+
+      if (!message) {
+        status.textContent = "पहले टेक्स्ट लिखो।";
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(message);
+      utterance.lang = language.value;
+      utterance.rate = Number(speed.value);
+      utterance.pitch = Number(pitch.value);
+
+      loadVoices();
+
+      const matchingVoice = voices.find(voice =>
+        voice.lang.toLowerCase() === language.value.toLowerCase()
+      );
+
+      if (matchingVoice) {
+        utterance.voice = matchingVoice;
+      }
+
+      utterance.onstart = () => {
+        status.textContent = "🔊 आवाज़ चल रही है...";
+      };
+
+      utterance.onend = () => {
+        status.textContent = "✅ बोलना पूरा हुआ।";
+      };
+
+      utterance.onerror = event => {
+        status.textContent =
+          "आवाज़ में समस्या: " + event.error +
+          ". ब्राउज़र या फोन की TTS सुविधा जाँचो।";
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    speed.addEventListener("input", () => {
+      speedValue.textContent = Number(speed.value).toFixed(1);
+    });
+
+    pitch.addEventListener("input", () => {
+      pitchValue.textContent = Number(pitch.value).toFixed(1);
+    });
+
+    document.getElementById("speak").addEventListener("click", () => {
+      speakText(textBox.value);
+    });
+
+    document.getElementById("stop").addEventListener("click", () => {
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+
+      status.textContent = "⏹ आवाज़ रोक दी गई।";
+    });
+
+    document.getElementById("test").addEventListener("click", () => {
+      const testMessage = language.value === "hi-IN"
+        ? "नमस्ते! आपकी हिंदी आवाज़ की जाँच हो रही है।"
+        : "Hello! Your voice test is ready.";
+
+      speakText(testMessage);
+    });
+
+    if ("speechSynthesis" in window) {
+      loadVoices();
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    } else {
+      status.textContent =
+        "इस ब्राउज़र में Speech Synthesis उपलब्ध नहीं है।";
+    }
+  </script>
+</body>
+</html>
