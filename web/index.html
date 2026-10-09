@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101629">
+  <title>DevGatha Quiz</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <h1>🛕 DevGatha Quiz</h1>
+    <p>धार्मिक सामान्य ज्ञान</p>
+
+    <div id="quiz">
+      <p id="progress"></p>
+      <h2 id="question">सवाल लोड हो रहे हैं...</h2>
+      <div id="answers"></div>
+      <p id="feedback" aria-live="polite"></p>
+      <button id="next" hidden>अगला सवाल</button>
+    </div>
+
+    <section id="result" hidden>
+      <h2>क्विज़ पूरी हुई!</h2>
+      <p id="score"></p>
+      <button id="restart">फिर से खेलें</button>
+    </section>
+
+    <p class="saved">तुम्हारा पिछला सर्वश्रेष्ठ स्कोर:
+      <strong id="best">0</strong>
+    </p>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
