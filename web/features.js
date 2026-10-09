@@ -271,8 +271,13 @@
       data.score += runScore;
       data.xp += runScore;
       data.scores.push({ name: data.name, score: data.score });
-      data.scores = data.scores.slice(-50);
+      data.scowres = data.scores.slice(-50);
       save();
+      const resultArea = document.getElementById("quizArea");
+if (resultArea) {
+  resultArea.innerHTML =
+    `<h3>Quiz पूरा हुआ!</h3><p>इस Quiz के अंक: ${runScore}/${order.length * 10}</p>`;
+}
       area.innerHTML = `<h3>Quiz पूरा हुआ!</h3>
         <p>इस Quiz के अंक: ${runScore}/${order.length * 10}</p>`;
     };
